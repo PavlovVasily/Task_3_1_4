@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+          integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"
+          crossorigin="anonymous">
+
+    <title>Vasyan</title>
+</head>
+<body>
+
+<!--Панель-->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div>
+            <span class="navbar-brand mb-0 h1"
+                  th:text="${authUser.email}">admin@admin.root</span>
+            <span style="color:white"> with roles: </span>
+            <span th:each="role : ${authUser.getRoles()}">
+                <span style="color: white" th:text="${role.role}"></span>
+            </span>
+        </div>
+        <a type="button" class="btn btn-dark" th:href="@{/logout}">Logout</a>
+    </div>
+</nav>
+
+<br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a th:each="role : ${authUser.getRoles()}">
+                    <a class="list-group-item list-group-item-action" id="list-home-list" data-toggle="list"
+                       th:href="'#' + ${role.role}" role="tab" aria-controls="home" th:text="${role.role}">Home</a>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-10">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="ROLE_ADMIN" role="tabpanel" aria-labelledby="list-home-list">
+                    <p class="h2">Admin Panel</p>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="usersTable-tab" data-toggle="tab" href="#usersTable"
+                               role="tab" aria-controls="usersTable" aria-selected="true">Users table</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="newUser-tab" data-toggle="tab" href="#newUser" role="tab"
+                               aria-controls="newUser" aria-selected="false">New User</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="usersTable" role="tabpanel"
+                             aria-labelledby="usersTable-tab">
+
+                            <p class="h5 p-3 fs-1 mb-2 bg-light text-dark">All users</p>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Имя</th>
+                                    <th scope="col">Возраст</th>
+                                    <th scope="col">Почта</th>
+                                    <th scope="col">Роли</th>
+                                    <th scope="col">Изменить</th>
+                                    <th scope="col">Удалить</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td scope="row" th:text="${user.id}"></td>
+                                    <td scope="row" th:text="${user.name}"></td>
+                                    <td th:text="${user.age}"></td>
+                                    <td><p th:text="${user.email}" align="left"></p></td>
+                                    <!--<td><p th:text="${user.password}" align="center"></p></td>-->
+                                    <td>
+                                        <span th:each="role : ${user.roles}">
+                                            <span th:text="${role.role}"></span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <!-- Button trigger modal edit -->
+                                        <button type="button" class="btn btn-info btn-sm mt-2"
+                                                data-toggle="modal"
+                                                th:attr="data-target='#modalEdit' + ${user.id}">Изменить
+                                        </button>
+
+                                        <div class="modal fade"
+                                             th:id="${'modalEdit'+user.id}" tabindex="-1"
+                                             role="dialog" aria-labelledby="exampleModalCenterTitle"
+                                             aria-hidden="true">
+
+
+                                            <form th:method="PATCH"
+                                                  th:action="@{/admin/{id}(id=${user.getId()})}"
+                                                  th:object="${user}"
+                                                  th:id="the-form">
+
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Именить
+                                                                пользователя</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+
+                                                        <!--ID-->
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                ID </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.id}"
+                                                                                   disabled/>
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Name-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="name">
+                                                                                Полное имя </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.name}"
+                                                                                   th:name="name"
+                                                                                   th:id="name"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Age-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                Возраст </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.age}"
+                                                                                   th:name="age"
+                                                                                   th:id="age"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Email-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                Почта </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.email}"
+                                                                                   th:name="email"
+                                                                                   th:id="email"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Пароль-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="password">
+                                                                                Пароль </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:name="password"
+                                                                                   th:id="password"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Повторите пароль-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                Повторите пароль </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:name="passwordConfirm"
+                                                                                   th:id="passwordConfirm"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <!--Roles-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col"></div>
+                                                                        <div class="col">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="passwordConfirm">Выберите
+                                                                                роль </label>
+                                                                            <select class="custom-select" size="3"
+                                                                                    name="roleNames" multiple>
+                                                                                <option value="ROLE_USER">USER</option>
+                                                                                <option value="ROLE_ADMIN" selected>
+                                                                                    ADMIN
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Close
+                                                            </button>
+                                                            <input type="submit" class="btn btn-primary"
+                                                                   value="Изменить"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <!--<form th:method="DELETE" th:action="@{/admin/{id}(id=${user.getId()})}">
+                                            <input class="btn btn-danger" type="submit" value="Удалить"/>
+                                        </form>-->
+
+
+                                        <!-- Button trigger modal edit -->
+                                        <button type="button" class="btn btn-danger btn-sm mt-2"
+                                                data-toggle="modal"
+                                                th:attr="data-target='#modalDelete' + ${user.id}">Удалить
+                                        </button>
+
+                                        <div class="modal fade"
+                                             th:id="${'modalDelete'+user.id}" tabindex="-1"
+                                             role="dialog" aria-labelledby="exampleModalCenterTitle"
+                                             aria-hidden="true">
+
+
+                                            <form th:method="DELETE"
+                                                  th:action="@{/admin/{id}(id=${user.getId()})}"
+                                                  th:object="${user}"
+                                                  th:id="the-form">
+
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" >Удалить пользователя</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+
+                                                        <!--ID-->
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="id">
+                                                                                ID </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   id="id"
+                                                                                   th:value="${user.id}"
+                                                                                   disabled/>
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Name-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="name">
+                                                                                Полное имя </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.name}"
+                                                                                   th:name="name"
+                                                                                   th:id="name"
+                                                                                   disabled
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Age-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                Возраст </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.age}"
+                                                                                   th:name="age"
+                                                                                   th:id="age"
+                                                                                   disabled
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Email-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                Почта </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:value="${user.email}"
+                                                                                   th:name="email"
+                                                                                   th:id="email"
+                                                                                   disabled
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--&lt;!&ndash;Пароль&ndash;&gt;
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="password">
+                                                                                Пароль </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:name="password"
+                                                                                   th:id="password"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            &lt;!&ndash;Повторите пароль&ndash;&gt;
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3"></div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="d-flex justify-content-center font-weight-bold">
+                                                                                Повторите пароль </label>
+                                                                            <input type="text"
+                                                                                   class="form-control text-center"
+                                                                                   th:name="passwordConfirm"
+                                                                                   th:id="passwordConfirm"
+                                                                            />
+                                                                        </div>
+                                                                        <div class="col-md-3"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>-->
+
+
+                                                            <!--Roles-->
+                                                            <div class="form-group">
+                                                                <div class="container">
+                                                                    <div class="row">
+                                                                        <div class="col"></div>
+                                                                        <div class="col">
+                                                                            <label class="d-flex justify-content-center font-weight-bold"
+                                                                                   for="passwordConfirm">Выберите
+                                                                                роль </label>
+                                                                            <select class="custom-select" size="3"
+                                                                                    name="roleNames" multiple disabled>
+                                                                                <option value="ROLE_USER">USER</option>
+                                                                                <option value="ROLE_ADMIN" selected>
+                                                                                    ADMIN
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Close
+                                                            </button>
+                                                            <input type="submit" class="btn btn-danger"
+                                                                   value="Удалить"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+
+
+
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane fade" id="newUser" role="tabpanel" aria-labelledby="newUser-tab">
+                            <p class="h5 p-3 fs-1 mb-2 bg-light text-dark">Add new user</p>
+                            <form th:method="POST" th:action="@{/admin/new}" th:object="${user}">
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="d-flex justify-content-center font-weight-bold"
+                                                       for="name">
+                                                    Введите имя </label>
+                                                <input type="text" class="form-control" style="background: #F7EE72;"
+                                                       th:field="*{name}" id="name"/>
+                                                <!--<div style="color:#ff0000" th:if="${#fields.hasErrors('name')}"
+                                                     th:errors="*{name}">Name error
+                                                </div>-->
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="d-flex justify-content-center font-weight-bold" for="age">
+                                                    Введите
+                                                    возраст </label>
+                                                <input type="text" class="form-control" style="background: #FFFFFF;"
+                                                       th:field="*{age}" id="age"/>
+                                                <!--<div style="color:red" th:if="${#fields.hasErrors('age')}"
+                                                     th:errors="*{age}">
+                                                    Age error
+                                                </div>-->
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="d-flex justify-content-center font-weight-bold"
+                                                       for="email">
+                                                    Введите почту </label>
+                                                <input class="form-control" style="background: #F7EE72;" type="text"
+                                                       th:field="*{email}"
+                                                       id="email"/>
+                                                <!--<div style="color:red" th:if="${#fields.hasErrors('email')}"
+                                                     th:errors="*{email}">Email error
+                                                </div>
+                                                <div style="color:red" th:if="${emailError != null}"
+                                                     th:text="${emailError}">
+                                                    Email error
+                                                </div>-->
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="d-flex justify-content-center font-weight-bold"
+                                                       for="password">
+                                                    Введите
+                                                    пароль </label>
+                                                <input class="form-control" style="background: #FFFFFF;" type="text"
+                                                       th:field="*{password}"
+                                                       id="password"/>
+                                                <!--<div style="color:red" th:if="${#fields.hasErrors('password')}"
+                                                     th:errors="*{password}">Password
+                                                    error
+                                                </div>-->
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="d-flex justify-content-center font-weight-bold"
+                                                       for="passwordConfirm"> Повторите
+                                                    пароль: </label>
+                                                <input class="form-control" style="background: #FFFFFF;" type="text"
+                                                       th:field="*{passwordConfirm}"
+                                                       id="passwordConfirm"/>
+                                                <!--<div style="color:red" th:if="${passwordError != null}"
+                                                     th:text="${passwordError}">Confirm password
+                                                    error
+                                                </div>-->
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="d-flex justify-content-center font-weight-bold"
+                                                       for="passwordConfirm">Выберите
+                                                    роль </label>
+                                                <select class="custom-select" size="3" name="roleNames" multiple>
+                                                    <option value="ROLE_USER">USER</option>
+                                                    <option value="ROLE_ADMIN" selected>ADMIN</option>
+                                                </select>
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col text-center">
+                                                <button class="btn btn-success" type="submit"> Создать пользователя
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show" id="ROLE_USER" role="tabpanel"
+                     aria-labelledby="list-profile-list">
+                    <p class="h2">User information page</p>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <p class="h5 p-3 fs-1 mb-2 bg-light text-dark">About user</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Имя</th>
+                                        <th scope="col">Возраст</th>
+                                        <th scope="col">Почта</th>
+                                        <th scope="col">Роли</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    <tr>
+                                        <td scope="row" th:text="${authUser.id}"></td>
+                                        <td scope="row" th:text="${authUser.name}"></td>
+                                        <td th:text="${authUser.age}"></td>
+                                        <td><p th:text="${authUser.email}" align="left"></p></td>
+                                        <td>
+                                        <span th:each="role : ${authUser.roles}">
+                                            <span th:text="${role.role}"></span>
+                                        </span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"
+        integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
