@@ -21,6 +21,7 @@ public class UserDaoImp implements UserDao {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+
     @Override
     @Transactional
     public boolean saveUser(String name, String email, byte age, String password, String[] roleNames) {
@@ -56,16 +57,19 @@ public class UserDaoImp implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        return em.createQuery("select u from User u join fetch u.roles").getResultList();
+        List<User> notSortList = new ArrayList<>(
+                new HashSet<>(
+                        em.createQuery("select u from User u join fetch u.roles").
+                                getResultList()));
+
+        return notSortList.stream().
+                sorted(((o1, o2) -> (int) (o1.getId() - o2.getId()))).
+                collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public boolean updateUser(User user, String[] roleNames) {
-
-        for (String roleName : roleNames) {
-            System.out.println(roleName);
-        }
 
         List<Role> roleList = em.createQuery("select r from Role r where r.role IN (:roles)", Role.class)
                 .setParameter("roles", Arrays.asList(roleNames))
@@ -82,9 +86,9 @@ public class UserDaoImp implements UserDao {
     @Override
     public User getUserById(Long id) {
         User user = em.find(User.class, id);
-        if (user == null) {
-            throw new EntityNotFoundException("Пользователя с Id=" + id + " нет");
-        }
+//        if (user == null) {
+//            throw new EntityNotFoundException("Пользователя с Id=" + id + " нет");
+//        }
         return user;
     }
 
