@@ -32,8 +32,10 @@ public class MyRestController {
         return allUsers;
     }
 
+    @ResponseBody
     @GetMapping("/users/{id}")
     public User getUserById(@PathVariable long id){
+        System.out.println("users/" + id);
         User user = userService.getUserById(id);
 
         if (user == null) {
