@@ -42,7 +42,6 @@ public class User implements UserDetails {
     private String passwordConfirm;
 
     @ManyToMany(fetch = FetchType.LAZY)
-//    @JsonIgnore
     private Set<Role> roles;
 
     public User() {

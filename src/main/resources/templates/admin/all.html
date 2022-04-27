@@ -330,7 +330,8 @@
         <a type="button" class="btn btn-dark" th:href="@{/logout}">Logout</a>
     </div>
 </nav>
-
+<!--id cur admin-->
+<p hidden th:text="${authUser.id}" id="curID"></p>
 <br>
 <div class="container-fluid">
     <div class="row">
@@ -746,9 +747,6 @@
                                                     Введите имя </label>
                                                 <input type="text" class="form-control" style="background: #F7EE72;"
                                                        th:field="*{name}" id="name"/>
-                                                <!--<div style="color:#ff0000" th:if="${#fields.hasErrors('name')}"
-                                                     th:errors="*{name}">Name error
-                                                </div>-->
                                             </div>
                                             <div class="col"></div>
                                         </div>
@@ -765,10 +763,6 @@
                                                     возраст </label>
                                                 <input type="text" class="form-control" style="background: #FFFFFF;"
                                                        th:field="*{age}" id="age"/>
-                                                <!--<div style="color:red" th:if="${#fields.hasErrors('age')}"
-                                                     th:errors="*{age}">
-                                                    Age error
-                                                </div>-->
                                             </div>
                                             <div class="col"></div>
                                         </div>
@@ -787,13 +781,6 @@
                                                 <input class="form-control" style="background: #F7EE72;" type="text"
                                                        th:field="*{email}"
                                                        id="email"/>
-                                                <!--<div style="color:red" th:if="${#fields.hasErrors('email')}"
-                                                     th:errors="*{email}">Email error
-                                                </div>
-                                                <div style="color:red" th:if="${emailError != null}"
-                                                     th:text="${emailError}">
-                                                    Email error
-                                                </div>-->
                                             </div>
                                             <div class="col"></div>
                                         </div>
@@ -812,10 +799,6 @@
                                                 <input class="form-control" style="background: #FFFFFF;" type="text"
                                                        th:field="*{password}"
                                                        id="password"/>
-                                                <!--<div style="color:red" th:if="${#fields.hasErrors('password')}"
-                                                     th:errors="*{password}">Password
-                                                    error
-                                                </div>-->
                                             </div>
                                             <div class="col"></div>
                                         </div>
@@ -833,10 +816,6 @@
                                                 <input class="form-control" style="background: #FFFFFF;" type="text"
                                                        th:field="*{passwordConfirm}"
                                                        id="passwordConfirm"/>
-                                                <!--<div style="color:red" th:if="${passwordError != null}"
-                                                     th:text="${passwordError}">Confirm password
-                                                    error
-                                                </div>-->
                                             </div>
                                             <div class="col"></div>
                                         </div>
@@ -898,8 +877,8 @@
                                     </tr>
                                     </thead>
 
-                                    <tbody>
-                                    <tr>
+                                    <tbody class="tableBodyCurUser">
+                                    <!--                                    <tr>
                                         <td scope="row" th:text="${authUser.id}"></td>
                                         <td scope="row" th:text="${authUser.name}"></td>
                                         <td th:text="${authUser.age}"></td>
@@ -909,7 +888,7 @@
                                             <span th:text="${role.role}"></span>
                                         </span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     </tbody>
                                 </table>
                             </div>

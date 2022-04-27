@@ -21,6 +21,15 @@ public class UserDaoImp implements UserDao {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Transactional
+    public void iniRoles () {
+        System.out.println("iniRoles");
+        em.createNativeQuery("INSERT INTO `pptask_3_1_2`.`roles` (`id`, `role`) VALUES ('1', 'ROLE_USER');")
+                .executeUpdate();
+        em.createNativeQuery("INSERT INTO `pptask_3_1_2`.`roles` (`id`, `role`) VALUES ('2', 'ROLE_ADMIN');")
+                .executeUpdate();
+
+    }
 
     @Override
     @Transactional

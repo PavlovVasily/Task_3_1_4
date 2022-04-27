@@ -1,10 +1,11 @@
 const tableBodyAllUsers = document.body.querySelector('.tableBodyAllUsers')
+const tableBodyCurUser = document.body.querySelector('.tableBodyCurUser')
 const modalDeleteUser = document.body.querySelector('#deleteModal')
 const modalUpdateUser = document.body.querySelector('#updateModal')
 const formAddUser = document.querySelector('.addUserForm')
 const formDeleteUser = document.querySelector('.deleteUserForm')
 const formUpdateUser = document.querySelector('.updateUserForm')
-
+const authId = document.body.querySelector('#curID')
 
 let user = ''
 let idCur
@@ -15,6 +16,24 @@ const URL = 'http://localhost:8080/api/users'
 // Functions
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const renderCurUserTable = (user) => {
+    output = ''
+    const roles = []
+    user.roles.forEach(role => roles.push(role.role))
+    output += `
+            <tr data-id="${user.id}"">
+                <td scope="row">${user.id}</td>
+                <td scope="row">${user.name}</td>
+                <td th:text="">${user.age}</td>
+                <td><p align="left">${user.email}</p></td>
+                <td>
+                    ${roles}
+                </td>
+            </tr>     
+            `;
+    tableBodyCurUser.innerHTML = output
 }
 
 const renderTable = (users) => {
@@ -99,21 +118,30 @@ fetch(URL)
 
             $('#updateModal').on('shown.bs.modal', function (e) {
                 // sleep(100).then(() => {
-                    modalUpdateUser.querySelector('input[name=id]').value = user.id
-                    modalUpdateUser.querySelector('input[name=name]').value = user.name
-                    modalUpdateUser.querySelector('input[name=age]').value = user.age
-                    modalUpdateUser.querySelector('input[name=email]').value = user.email
-                    modalUpdateUser.querySelector('input[name=password]').value = ''
-                    modalUpdateUser.querySelector('input[name=passwordConfirm]').value = ''
-                    const deselectedRoles = [...modalUpdateUser.querySelector('select').options]
-                        .forEach(option => option.selected = false)
+                modalUpdateUser.querySelector('input[name=id]').value = user.id
+                modalUpdateUser.querySelector('input[name=name]').value = user.name
+                modalUpdateUser.querySelector('input[name=age]').value = user.age
+                modalUpdateUser.querySelector('input[name=email]').value = user.email
+                modalUpdateUser.querySelector('input[name=password]').value = ''
+                modalUpdateUser.querySelector('input[name=passwordConfirm]').value = ''
+                const deselectedRoles = [...modalUpdateUser.querySelector('select').options]
+                    .forEach(option => option.selected = false)
 
-                    const selectedRoles = [...modalUpdateUser.querySelector('select').options]
-                        .filter(option => user.roles.some(role => option.value === role.role))
-                        .forEach(option => option.selected = 'selected')
+                const selectedRoles = [...modalUpdateUser.querySelector('select').options]
+                    .filter(option => user.roles.some(role => option.value === role.role))
+                    .forEach(option => option.selected = 'selected')
                 // })
             })
         })
+    })
+    .then(() => {
+        idCur = authId.textContent
+        console.log(idCur)
+        fetch(URL + '/' + idCur)
+            .then(res => res.json())
+            .then(data => {
+                renderCurUserTable(data)
+            })
     })
 
 // Update - update user
@@ -161,6 +189,18 @@ formUpdateUser.addEventListener('submit', (e) => {
                     renderTable(data)
                 })
         })
+
+        // Обновить таблицу пользователя
+        .then(() => {
+            idCur = formUpdateUser.elements.id.value
+            console.log(idCur)
+            fetch(URL + '/' + idCur)
+                .then(res => res.json())
+                .then(data => {
+                    renderCurUserTable(data)
+                })
+        })
+
 })
 
 // Delete - delete user
