@@ -192,8 +192,7 @@ formUpdateUser.addEventListener('submit', (e) => {
 
         // Обновить таблицу пользователя
         .then(() => {
-            idCur = formUpdateUser.elements.id.value
-            console.log(idCur)
+            idCur = authId.textContent
             fetch(URL + '/' + idCur)
                 .then(res => res.json())
                 .then(data => {
